@@ -4,6 +4,62 @@ const CORS_PROXIES = [
   'https://corsproxy.io/?',
 ];
 
+function processImageWithLimits(blob, maxWidth, maxHeight, crop, format, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width;
+      let h = img.height;
+
+      if (maxWidth || maxHeight) {
+        const targetW = maxWidth || w;
+        const targetH = maxHeight || h;
+
+        if (crop) {
+          const scale = Math.max(targetW / w, targetH / h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        } else {
+          const scale = Math.min(targetW / w, targetH / h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        const dx = (targetW - w) / 2;
+        const dy = (targetH - h) / 2;
+        ctx.drawImage(img, dx, dy, w, h);
+
+        canvas.toBlob((newBlob) => {
+          if (newBlob) resolve({ blob: newBlob, width: targetW, height: targetH });
+          else reject(new Error('Failed to process image'));
+        }, `image/${format}`, quality / 100);
+      } else {
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toBlob((newBlob) => {
+          if (newBlob) resolve({ blob: newBlob, width: w, height: h });
+          else reject(new Error('Failed to process image'));
+        }, `image/${format}`, quality / 100);
+      }
+    };
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
 async function generateImage(prompt, negativePrompt, size, hfKey, onProgress) {
   const width = size;
   const height = size;
