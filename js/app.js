@@ -79,7 +79,7 @@ let genSize = 768;
 let currentResultBlob = null;
 let currentResultInfo = null;
 
-const DEFAULT_HF_KEY = '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';
+const DEFAULT_HF_KEY = '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';
 const DEFAULT_OPENAI_KEY = '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';
 
 function t(key) {
@@ -254,7 +254,7 @@ async function generate() {
 
     const negativePrompt = buildNegativePrompt();
 
-    const blob = await generateWithHF(finalPrompt, negativePrompt, genSize, hfKey, (msg) => {
+    const blob = await generateImage(finalPrompt, negativePrompt, genSize, hfKey, (msg) => {
       genBtnText.textContent = msg;
     });
 
