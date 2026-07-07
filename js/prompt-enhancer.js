@@ -82,7 +82,6 @@ async function enhanceWithGPT(prompt, selectedColors, apiKey) {
     const data = await res.json();
     return data.choices[0].message.content.trim();
   } catch (err) {
-    console.error('GPT enhancement failed:', err);
     return null;
   }
 }
