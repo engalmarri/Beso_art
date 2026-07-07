@@ -79,6 +79,9 @@ let genSize = 768;
 let currentResultBlob = null;
 let currentResultInfo = null;
 
+const DEFAULT_HF_KEY = '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';
+const DEFAULT_OPENAI_KEY = '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';
+
 function t(key) {
   return TRANSLATIONS[currentLang][key] || key;
 }
@@ -110,11 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
     translatePage();
   }
 
-  // Restore API keys
+  // Restore API keys (use defaults if no saved keys)
   const savedHf = localStorage.getItem('beso_hf_key');
   const savedOpenai = localStorage.getItem('beso_openai_key');
-  if (savedHf) document.getElementById('hfKey').value = savedHf;
-  if (savedOpenai) document.getElementById('openaiKey').value = savedOpenai;
+  document.getElementById('hfKey').value = savedHf || DEFAULT_HF_KEY;
+  document.getElementById('openaiKey').value = savedOpenai || DEFAULT_OPENAI_KEY;
 
   // Color swatches
   document.querySelectorAll('.color-swatch').forEach(el => {
