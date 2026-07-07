@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="title">BESO ART - AI T-Shirt Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="container">
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🎨</span>
+      <h1>BESO ART</h1>
+      <span class="tagline" data-i18n="tagline">AI T-Shirt Designer</span>
+    </div>
+    <div class="lang-toggle">
+      <button id="langBtn" class="neon-btn small" onclick="toggleLang()" title="Toggle language">🇺🇸 EN</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Description Input -->
+    <section class="card">
+      <label class="section-label" data-i18n="descLabel">✏️ وصف التصميم / Design Description</label>
+      <textarea id="promptInput" class="neon-input" rows="4" placeholder="..." data-i18n-placeholder="descPlaceholder"></textarea>
+      <button id="enhanceBtn" class="neon-btn" onclick="enhancePrompt()">
+        <span data-i18n="enhanceBtn">✨ تحسين الوصف / Enhance Prompt</span>
+      </button>
+      <div id="enhancedContainer" class="enhanced-box hidden">
+        <div class="enhanced-header">
+          <span data-i18n="enhancedLabel">📝 الوصف المحسّن / Enhanced Prompt</span>
+          <button class="neon-btn tiny" onclick="useEnhanced()" data-i18n="useEnhanced">استخدام</button>
+        </div>
+        <p id="enhancedPrompt"></p>
+      </div>
+    </section>
+
+    <!-- Colors -->
+    <section class="card">
+      <label class="section-label" data-i18n="colorsLabel">🎨 الألوان / Colors (اختياري)</label>
+      <div class="color-grid" id="colorPalette">
+        <div class="color-swatch" style="background:#ff00ff" data-color="neon pink"></div>
+        <div class="color-swatch" style="background:#00ffff" data-color="cyan"></div>
+        <div class="color-swatch" style="background:#ff0066" data-color="hot pink"></div>
+        <div class="color-swatch" style="background:#00ff88" data-color="neon green"></div>
+        <div class="color-swatch" style="background:#ff6600" data-color="neon orange"></div>
+        <div class="color-swatch" style="background:#9900ff" data-color="purple"></div>
+        <div class="color-swatch" style="background:#ffff00" data-color="neon yellow"></div>
+        <div class="color-swatch" style="background:#0044ff" data-color="electric blue"></div>
+        <div class="color-swatch" style="background:#ffffff" data-color="white" data-border="true"></div>
+        <div class="color-swatch" style="background:#111111" data-color="black"></div>
+      </div>
+      <p id="selectedColors" class="color-info" data-i18n="noColors">لم تختر أي لون بعد</p>
+    </section>
+
+    <!-- Generation Size -->
+    <section class="card">
+      <label class="section-label" data-i18n="genSizeLabel">📐 مقاس التوليد / Generation Size</label>
+      <div class="size-options">
+        <label class="size-option">
+          <input type="radio" name="genSize" value="512" onchange="setGenSize(512)">
+          <span>512 × 512</span>
+        </label>
+        <label class="size-option selected">
+          <input type="radio" name="genSize" value="768" checked onchange="setGenSize(768)">
+          <span>768 × 768</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Print Limits -->
+    <section class="card">
+      <label class="section-label" data-i18n="printLabel">📏 حدود الطباعة / Print Limits (اختياري)</label>
+      <p class="hint" data-i18n="printHint">حدد أقصى أبعاد للصورة لتتوافق مع مواقع الطباعة (مثل Redbubble, Printful)</p>
+      <div class="limits-row">
+        <div class="limit-field">
+          <span data-i18n="maxWidth">أقصى عرض</span>
+          <input type="number" id="maxWidth" class="neon-input sm" min="0" step="100" placeholder="px">
+        </div>
+        <span class="limit-x">×</span>
+        <div class="limit-field">
+          <span data-i18n="maxHeight">أقصى ارتفاع</span>
+          <input type="number" id="maxHeight" class="neon-input sm" min="0" step="100" placeholder="px">
+        </div>
+      </div>
+      <label class="checkbox-label">
+        <input type="checkbox" id="cropToggle" checked>
+        <span data-i18n="cropToggle">تكبير تلقائي مع قص مركزي (Auto upscale + center crop)</span>
+      </label>
+    </section>
+
+    <!-- Quality -->
+    <section class="card">
+      <label class="section-label" data-i18n="qualityLabel">🎚 جودة الصورة / Quality</label>
+      <div class="quality-row">
+        <label class="radio-label">
+          <input type="radio" name="imgFormat" value="png" checked onchange="toggleQuality()">
+          <span>PNG <small data-i18n="lossless">(بدون فقدان)</small></span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="imgFormat" value="jpeg" onchange="toggleQuality()">
+          <span>JPEG</span>
+        </label>
+      </div>
+      <div class="quality-slider-row">
+        <span>80%</span>
+        <input type="range" id="qualitySlider" min="80" max="100" value="95" step="1" oninput="updateQualityLabel()">
+        <span>100%</span>
+        <span id="qualityValue">95%</span>
+      </div>
+    </section>
+
+    <!-- API Keys -->
+    <section class="card">
+      <label class="section-label">🔑 API Keys</label>
+      <div class="api-field">
+        <span data-i18n="hfKey">Hugging Face</span>
+        <input type="password" id="hfKey" class="neon-input" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+        <a href="https://huggingface.co/settings/tokens" target="_blank" class="get-key" data-i18n="getKey">الحصول على مفتاح</a>
+      </div>
+      <div class="api-field">
+        <span data-i18n="openaiKey">OpenAI (اختياري - لتحسين أعمق)</span>
+        <input type="password" id="openaiKey" class="neon-input" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+      </div>
+    </section>
+
+    <!-- Generate -->
+    <button id="generateBtn" class="neon-btn generate-btn" onclick="generate()">
+      <span id="genBtnText" data-i18n="generateBtn">⚡ توليد الصورة / Generate</span>
+      <div id="spinner" class="spinner hidden"></div>
+    </button>
+
+    <!-- Result -->
+    <section id="resultSection" class="card result-card hidden">
+      <div class="result-header">
+        <span data-i18n="result">🖼 النتيجة / Result</span>
+        <span id="imageInfo" class="image-info"></span>
+      </div>
+      <div class="image-container" id="imageContainer">
+        <img id="resultImage" alt="Generated T-shirt design">
+      </div>
+      <button id="downloadBtn" class="neon-btn" onclick="downloadImage()">
+        <span data-i18n="downloadBtn">⬇ تحميل / Download</span>
+      </button>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2024 BESO ART — <span data-i18n="footer">مولد تصاميم تيشرتات بالذكاء الاصطناعي</span></p>
+  </footer>
+</div>
+
+<script src="js/prompt-enhancer.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
